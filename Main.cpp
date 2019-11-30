@@ -109,9 +109,19 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                     for (int k = 0; k < row; k++)
                     {
                         if ( (k-1 >= 0 && !tmpState[k-1][j]) || 
-                            (k+1 < col && !tmpState[k+1][j]) ||
+                            (k+1 < row && !tmpState[k+1][j]) ||
                             (j-1 >= 0 && !tmpState[k][j-1]) ||
-                            (j+1 < row && !tmpState[k][j+1]))
+                            (j+1 < col && !tmpState[k][j+1]) ||
+                            (
+                                ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[j+1][k+1]) ) || //Checkong right side of node
+                                ( (j-1 >= col && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[j-1][k+1] ) )|| //Checking left side of node
+                                ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[j+1][k+1]) ) || //checking bottom side of node
+                                ( (k-1 >= 0  && j+1 < col &&  !tmpState[k+1][j+1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 &&  !tmpState[k-1][j-1] )) //Checking topside of node   
+
+
+                            )
+                            ) 
+                          
                         {
                             twoWhites = true;
                             break;
