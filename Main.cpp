@@ -62,9 +62,34 @@ void DeleteState(bool** state, int row, int col)
     delete[] state;
 }
 
+// void printStates(vector<vector<bool>> a) 
+// {
+//     for (int i; i<a.size(); i++)
+//     {
+//         for(int j; j<a[0].size(); j++) 
+//         {
+//             cout << a[i][j] << endl;
+//         }
+//     }
+
+// }
+
+void printState(bool** state, int row, int col) 
+{
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            cout << state[i][j] << endl;
+        }
+    }
+
+}
+
 vector<bool**> successor(int** table, bool** state, int row, int col)
 {
     vector<bool**> result;
+    
     for (int i = 0; i < row; i++)
     {
         // vector<int> repeateds;
@@ -94,12 +119,14 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                          
                          )
                     {
+                        cout << "test1" << endl;
                         twoWhites = true;
                         break;
                     }
 
                     if (table[i][j] == table[i][k])
                     {
+                        cout << "test2" << endl;
                         tmpState[i][k] = false;
                     }
                 }
@@ -113,9 +140,9 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                             (j-1 >= 0 && !tmpState[k][j-1]) ||
                             (j+1 < col && !tmpState[k][j+1]) ||
                             (
-                                ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[j+1][k+1]) ) || //Checkong right side of node
-                                ( (j-1 >= col && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[j-1][k+1] ) )|| //Checking left side of node
-                                ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[j+1][k+1]) ) || //checking bottom side of node
+                                ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //Checkong right side of node
+                                ( (j-1 >= 0 && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[k+1][j-1] ) )|| //Checking left side of node
+                                ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //checking bottom side of node
                                 ( (k-1 >= 0  && j+1 < col &&  !tmpState[k+1][j+1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 &&  !tmpState[k-1][j-1] )) //Checking topside of node   
 
 
@@ -123,12 +150,14 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                             ) 
                           
                         {
+                            cout << "test3" << endl;
                             twoWhites = true;
                             break;
                         }
 
                         if (table[i][j] == table[k][j])
                         {
+                            cout << "test4" << endl;
                             tmpState[k][j] = false;
                         }
                     }
@@ -136,10 +165,15 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
 
                 if (!twoWhites)
                 {
+                    cout << "pushing" << endl;
                     result.push_back(tmpState);
+                    // printState(tmpState, row, col);
+                    
                 }
                 else
-                {
+                {   
+                    cout << "deletion" << endl;
+                    // printState(tmpState, row, col);
                     DeleteState(tmpState, row, col);
                 }
                 
@@ -153,6 +187,7 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
             // }
         }
     }
+    return result;
 }
 
 void greedy(int** table, int row, int col)
@@ -175,7 +210,7 @@ void greedy(int** table, int row, int col)
 
         current_state_childs = successor(table, current_state, row, col);
 
-        current_state = heuristic(current_state_childs, row, col);
+        //current_state = heuristic(current_state_childs, row, col);
 
     }
 }
@@ -185,7 +220,8 @@ int main(int argc, char** argv)
     vector<vector<int>> table_vec;
 
     ifstream input_file("samples/sample" + (string) argv[2] + ".txt");
-
+    string newArgv;
+    newArgv = string(argv[1]);
     char tmp = ' ';
     vector<int> tmp_vec;
     while(!input_file.eof())
@@ -212,6 +248,9 @@ int main(int argc, char** argv)
             table[i][j] = table_vec[i][j];
         }
     }
+
+    int row = table_vec.size();
+    int col = table_vec[0].size();
     
     for (int i = 0; i < table_vec.size(); i++)
     {
@@ -222,9 +261,25 @@ int main(int argc, char** argv)
         cout << endl;
     }
 
-    // which algorithm
-    if (argv[1] == "greedy")
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
     {
-        greedy(table, table_vec.size(); table_vec[0].size());
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    //successor(table, current_state, row, col);
+    //which algorithm
+    cout << "fckNazi" << endl;
+    // printState(current_state, row, col);
+
+    // successor(table, current_state, row, col);
+    if (newArgv == "greedy")
+    {
+        successor(table, current_state, row, col);
+        cout << "wtf" << endl;
     }
 }
