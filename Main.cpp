@@ -80,8 +80,9 @@ void printState(bool** state, int row, int col)
     {
         for (int j = 0; j < col; j++)
         {
-            cout << state[i][j] << endl;
+            cout << state[i][j] << ' ';
         }
+        cout << endl;
     }
 
 }
@@ -89,7 +90,7 @@ void printState(bool** state, int row, int col)
 vector<bool**> successor(int** table, bool** state, int row, int col)
 {
     vector<bool**> result;
-    
+    int counter = 0;
     for (int i = 0; i < row; i++)
     {
         // vector<int> repeateds;
@@ -101,80 +102,106 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
             //     bool flag = false;
                 bool** tmpState = CopyState(state, row, col);
                 bool twoWhites = false;
+                bool repeated = false;
                 // if (!(!table[i][j-1] && !table[i][j+1] && !table[i-1][j] && !table[i+1][j]))
 
                 for (int k = 0; k < col; k++)
                 {
-                    if ( (i-1 >= 0 && !tmpState[i-1][k]) || 
-                         (i+1 < row && !tmpState[i+1][k]) ||
-                         (k-1 >= 0 && !tmpState[i][k-1]) ||
-                         (k+1 < col && !tmpState[i][k+1]) ||
-                         
-                         (
-                            ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) ) ||
-                            ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 < col && !tmpState[i][k+2]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
-                            ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
-                            ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) )
-                         )
-                         
-                         )
+                    if (k != j)
                     {
-                        cout << "test1" << endl;
-                        twoWhites = true;
-                        break;
-                    }
 
-                    if (table[i][j] == table[i][k])
-                    {
-                        cout << "test2" << endl;
-                        tmpState[i][k] = false;
+                        if (table[i][j] == table[i][k])
+                        {
+                            if ( (i-1 >= 0 && !tmpState[i-1][k]) || 
+                                (i+1 < row && !tmpState[i+1][k]) ||
+                                (k-1 >= 0 && !tmpState[i][k-1]) ||
+                                (k+1 < col && !tmpState[i][k+1]) ||
+                                
+                                (
+                                    ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) ) ||
+                                    ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 < col && !tmpState[i][k+2]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) )
+                                )
+                                
+                                )
+                            {
+                                // cout << "test1" << endl;
+                                twoWhites = true;
+                                break;
+                            }
+                            
+                            repeated = true;
+                            // cout << "test2" << endl;
+                            tmpState[i][k] = false;
+                        }
+
                     }
                 }
+
+
 
                 if (!twoWhites)
                 {
                     for (int k = 0; k < row; k++)
                     {
-                        if ( (k-1 >= 0 && !tmpState[k-1][j]) || 
-                            (k+1 < row && !tmpState[k+1][j]) ||
-                            (j-1 >= 0 && !tmpState[k][j-1]) ||
-                            (j+1 < col && !tmpState[k][j+1]) ||
-                            (
-                                ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //Checkong right side of node
-                                ( (j-1 >= 0 && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[k+1][j-1] ) )|| //Checking left side of node
-                                ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //checking bottom side of node
-                                ( (k-1 >= 0  && j+1 < col &&  !tmpState[k+1][j+1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 &&  !tmpState[k-1][j-1] )) //Checking topside of node   
-
-
-                            )
-                            ) 
-                          
+                        if (k != i)
                         {
-                            cout << "test3" << endl;
-                            twoWhites = true;
-                            break;
-                        }
+                            if (table[i][j] == table[k][j])
+                            {
+                                if ( (k-1 >= 0 && !tmpState[k-1][j]) || 
+                                    (k+1 < row && !tmpState[k+1][j]) ||
+                                    (j-1 >= 0 && !tmpState[k][j-1]) ||
+                                    (j+1 < col && !tmpState[k][j+1]) ||
+                                    (
+                                        // ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //Checkong right side of node
+                                        // ( (j-1 >= 0 && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[k+1][j-1] ) )|| //Checking left side of node
+                                        // ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //checking bottom side of node
+                                        // ( (k-1 >= 0  && j+1 < col &&  !tmpState[k+1][j+1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 &&  !tmpState[k-1][j-1] )) //Checking topside of node   
 
-                        if (table[i][j] == table[k][j])
-                        {
-                            cout << "test4" << endl;
-                            tmpState[k][j] = false;
+                                        ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (k+2 < row && !tmpState[k+2][j]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) ) ||
+                                        ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) )
+
+                                    )
+                                    ) 
+                                
+                                {
+                                    // cout << "test3" << endl;
+                                    twoWhites = true;
+                                    break;
+                                }
+                                // cout << "test4" << endl;
+                                repeated = true;
+                                tmpState[k][j] = false;
+                            }
+
                         }
                     }
                 }
 
-                if (!twoWhites)
+                // cout << "heeloo" << endl;
+
+
+                if (!twoWhites && repeated)
                 {
-                    cout << "pushing" << endl;
+                    // cout << "pushing" << endl;
                     result.push_back(tmpState);
                     // printState(tmpState, row, col);
-                    
+                    counter++;
+                    // cout << counter << endl;
+                    // cin.get();
                 }
-                else
+                
+                if (twoWhites || !repeated)
                 {   
-                    cout << "deletion" << endl;
+                    // cout << "deletion" << endl;
                     // printState(tmpState, row, col);
                     DeleteState(tmpState, row, col);
+                    counter++;
+                    // cout << counter << endl;
+                    // cin.get();
                 }
                 
             //     if (flag)
@@ -187,6 +214,7 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
             // }
         }
     }
+    cout << counter << endl;
     return result;
 }
 
