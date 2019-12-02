@@ -218,6 +218,38 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
     return result;
 }
 
+bool** heuristic1(vector<bool**> current_state_childs, int row, int col) 
+{
+    
+    bool ** tmp;
+    vector<int> black_num;
+    for(int x = 0; x < current_state_childs.size(); x++)
+    {
+        int counter = 0;
+        for(int i = 0; i < row; i++)
+        {
+            for(int j = 0; j < col; j++)
+            {
+                if(current_state_childs[x][i][j] == false)
+                {
+                    counter++;
+                }
+            }
+        }
+        cout << "this is counter "<< counter << endl;
+        black_num.push_back(counter);
+    }
+
+    int max_black = *max_element(black_num.begin(), black_num.end());
+    // cout << max_black << endl;
+    auto max_black_return = current_state_childs[max_black];
+    
+    cin.get();
+    return max_black_return;
+}
+
+
+
 void greedy(int** table, int row, int col)
 {
     bool** current_state = new bool*[row];
@@ -238,10 +270,15 @@ void greedy(int** table, int row, int col)
 
         current_state_childs = successor(table, current_state, row, col);
 
-        //current_state = heuristic(current_state_childs, row, col);
-
+        current_state = heuristic1(current_state_childs, row, col);
+        cout << "current state" << endl;
+        printState(current_state, row, col);
     }
+    cout << "we have reached the goal" << endl;
 }
+
+
+
 
 int main(int argc, char** argv)
 {
@@ -307,7 +344,8 @@ int main(int argc, char** argv)
     // successor(table, current_state, row, col);
     if (newArgv == "greedy")
     {
-        successor(table, current_state, row, col);
+        // successor(table, current_state, row, col);
+        greedy(table, row, col);
         cout << "wtf" << endl;
     }
 }
