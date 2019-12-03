@@ -327,6 +327,7 @@ void greedy1(int** table, int row, int col)
         }
     }
 
+    cout <<"test1" << endl;
 
     // int** current_state = table;
     vector<bool**> current_state_childs;
@@ -337,32 +338,40 @@ void greedy1(int** table, int row, int col)
     for (int i = 0; i < current_state_childs.size(); i++ )
     {
         pq.push(current_state_childs[i]);
+        // printState(pq.top(), row, col);
+        // cout<< endl;
     }
 
-
+    // cout <<"test2" << endl;
     
 
-    //pq.push(current_state);
+    
     while (!pq.empty())
     {
         current_state = pq.top();
+        printState(current_state, row, col);
         pq.pop();
-        
+        // cout <<"test3" << endl;
 
         if (is_goal(table, current_state, row, col))
         {
             cout << "we have reached the goal" << endl;
             printState(current_state, row, col);
+            break;
         }
 
         else
         {
+            cout <<"test4" << endl;
             vector<bool**> new_state_childs;
+            cout << "test5" << endl;
             new_state_childs = successor(table, current_state, row, col);
-            for (int i = 0; i < current_state_childs.size(); i++ )
+            for (int i = 0; i < new_state_childs.size(); i++ )
             {
                 pq.push(new_state_childs[i]);
             }
+            cout <<"test6" << endl;
+            new_state_childs.clear();
             
             
         }
