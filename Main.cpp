@@ -382,7 +382,7 @@ void greedy1(int** table, int row, int col)
     
 }
 
-void a_star(int** table, int row, int col)
+void a_star1(int** table, int row, int col)
 {
     // while (!)
 }
