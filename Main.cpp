@@ -230,7 +230,7 @@ bool** heuristic1(vector<bool**> current_state_childs, int row, int col)
 {
     cout << "heuristic size: " << current_state_childs.size() << endl;
 
-    bool ** tmp;
+    
     vector<pair<int, int>> black_num;
     for(int x = 0; x < current_state_childs.size(); x++)
     {
@@ -306,6 +306,71 @@ void greedy(int** table, int row, int col)
     }
     cout << "we have reached the goal" << endl;
     printState(current_state, row, col);
+}
+
+
+
+// bool** heuristic2(vector<bool**> current_state_childs, int row, int col)
+// {
+
+// }
+
+void greedy1(int** table, int row, int col)
+{
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+
+    // int** current_state = table;
+    vector<bool**> current_state_childs;
+    current_state_childs = successor(table, current_state, row, col);
+
+    priority_queue<bool**> pq;
+
+    for (int i = 0; i < current_state_childs.size(); i++ )
+    {
+        pq.push(current_state_childs[i]);
+    }
+
+
+    
+
+    //pq.push(current_state);
+    while (!pq.empty())
+    {
+        current_state = pq.top();
+        pq.pop();
+        
+
+        if (is_goal(table, current_state, row, col))
+        {
+            cout << "we have reached the goal" << endl;
+            printState(current_state, row, col);
+        }
+
+        else
+        {
+            vector<bool**> new_state_childs;
+            new_state_childs = successor(table, current_state, row, col);
+            for (int i = 0; i < current_state_childs.size(); i++ )
+            {
+                pq.push(new_state_childs[i]);
+            }
+            
+            
+        }
+     
+        // printState(current_state, row, col);
+        // cin.get();
+    }
+    
 }
 
 void a_star(int** table, int row, int col)
@@ -426,7 +491,7 @@ int main(int argc, char** argv)
     if (newArgv == "greedy")
     {
         // successor(table, current_state, row, col);
-        greedy(table, row, col);
+        greedy1(table, row, col);
         cout << "wtf" << endl;
     }
 }
