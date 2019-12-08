@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -18,7 +19,6 @@ bool is_goal(int** table, bool** state, int row, int col)
                 {
                     if (table[i][j] == table[i][k] && state[i][j] && state[i][k])
                     {
-                        // cout << "it's not goal" << endl;
                         return false;
                     }
                 }
@@ -30,15 +30,12 @@ bool is_goal(int** table, bool** state, int row, int col)
                 {
                     if (table[i][j] == table[k][j] && state[i][j] && state[k][j])
                     {
-                        // cout << "it's not goal" << endl;
                         return false;
                     }
                 }
             }
         }
     }
-
-    // cout << "it's goal" << endl;
 
     return true;
 }
@@ -66,18 +63,6 @@ void DeleteState(bool** state, int row, int col)
     delete[] state;
 }
 
-// void printStates(vector<vector<bool>> a) 
-// {
-//     for (int i; i<a.size(); i++)
-//     {
-//         for(int j; j<a[0].size(); j++) 
-//         {
-//             cout << a[i][j] << endl;
-//         }
-//     }
-
-// }
-
 void printState(bool** state, int row, int col) 
 {
     for (int i = 0; i < row; i++)
@@ -97,19 +82,14 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
     int counter = 0;
     for (int i = 0; i < row; i++)
     {
-        // vector<int> repeateds;
         for (int j = 0; j < col; j++)
         {
             
-            // if (!(find(repeateds.begin(), repeateds.end(), table[i][j]) != repeateds.end()))
-            // {
-            //     bool flag = false;
             if (state[i][j])
             {
                 bool** tmpState = CopyState(state, row, col);
                 bool twoWhites = false;
                 bool repeated = false;
-                // if (!(!table[i][j-1] && !table[i][j+1] && !table[i-1][j] && !table[i+1][j]))
 
                 for (int k = 0; k < col; k++)
                 {
@@ -122,23 +102,18 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                 (i+1 < row && !tmpState[i+1][k]) ||
                                 (k-1 >= 0 && !tmpState[i][k-1]) ||
                                 (k+1 < col && !tmpState[i][k+1]) ||
-                                
                                 (
                                     ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) ) ||
                                     ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 < col && !tmpState[i][k+2]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
                                     ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
                                     ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) )
                                 )
-                                
                                 )
                             {
-                                // cout << "test1" << endl;
                                 twoWhites = true;
                                 break;
                             }
-                            
                             repeated = true;
-                            // cout << "test2" << endl;
                             tmpState[i][k] = false;
                         }
 
@@ -160,25 +135,17 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                     (j-1 >= 0 && !tmpState[k][j-1]) ||
                                     (j+1 < col && !tmpState[k][j+1]) ||
                                     (
-                                        // ( (j+1 < col && k-1 >= 0 && !tmpState[k-1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //Checkong right side of node
-                                        // ( (j-1 >= 0 && k-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (j-1 >= 0  && k+1 < row && !tmpState[k+1][j-1] ) )|| //Checking left side of node
-                                        // ( (j-1 >= 0 && k+1 < row && !tmpState[k+1][j-1]) && (k+2 < row && !tmpState[k+2][j]) && (j+1 < col && k+1 < row && !tmpState[k+1][j+1]) ) || //checking bottom side of node
-                                        // ( (k-1 >= 0  && j+1 < col &&  !tmpState[k+1][j+1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 &&  !tmpState[k-1][j-1] )) //Checking topside of node   
-
                                         ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (k+2 < row && !tmpState[k+2][j]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) ) ||
                                         ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
                                         ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
                                         ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) )
-
                                     )
                                     ) 
                                 
                                 {
-                                    // cout << "test3" << endl;
                                     twoWhites = true;
                                     break;
                                 }
-                                // cout << "test4" << endl;
                                 repeated = true;
                                 tmpState[k][j] = false;
                             }
@@ -187,48 +154,24 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                     }
                 }
 
-                // cout << "heeloo" << endl;
-
-
                 if (!twoWhites && repeated)
                 {
-                    // cout << "pushing" << endl;
                     result.push_back(tmpState);
-                    // printState(tmpState, row, col);
-                    // counter++;
-                    // cout << counter << endl;
-                    // cin.get();
                 }
                 
                 if (twoWhites || !repeated)
                 {   
-                    // cout << "deletion" << endl;
-                    // printState(tmpState, row, col);
                     DeleteState(tmpState, row, col);
-                    // counter++;
-                    // cout << counter << endl;
-                    // cin.get();
                 }
-                
-            //     if (flag)
-            //     {
-            //         bool** tmpState = CopyState(state, row, col);
-            //         tmpState[i][j] = false;
-            //         result.push_back(tmpState);
-            //         repeateds.push_back(table[i][j]);
-            //     }
-            // }
-
             }
         }
     }
-    // cout << counter << endl;
     return result;
 }
 
 bool** heuristic1(vector<bool**> current_state_childs, int row, int col) 
 {
-    cout << "heuristic size: " << current_state_childs.size() << endl;
+    // cout << "heuristic size: " << current_state_childs.size() << endl;
 
     
     vector<pair<int, int>> black_num;
@@ -266,9 +209,211 @@ bool** heuristic1(vector<bool**> current_state_childs, int row, int col)
     return current_state_childs.at(max_tmp_index);
 }
 
+int tRow, tCol;
+bool heuristic1_comprator(bool** state1, bool** state2)
+{
+    int state1_counter = 0;
+    int state2_counter = 0;
+    for (int i = 0; i < tRow; i++)
+    {
+        for (int j = 0; j < tCol; j++)
+        {
+            if (!state1[i][j])
+            {
+                state1_counter++;
+            }
+            if (!state2[i][j])
+            {
+                state2_counter++;
+            }
+        }
+    }
 
+    if (state1_counter >= state2_counter)
+    {
+        return false;
+    }
+    return true;
+}
+
+class state_with_depth
+{
+public:
+    bool** state;
+    int row;
+    int col;
+    int depth;
+
+    state_with_depth(bool** state, int row, int col, int depth)
+    {
+        this->state = state;
+        this->row = row;
+        this->col = col;
+        this->depth = depth;
+    }
+};
+
+bool heuristic1_comprator_a_star(state_with_depth state1, state_with_depth state2)
+{
+    int state1_counter = 0;
+    int state2_counter = 0;
+    for (int i = 0; i < state1.row; i++)
+    {
+        for (int j = 0; j < state1.col; j++)
+        {
+            if (!state1.state[i][j])
+            {
+                state1_counter++;
+            }
+            if (!state2.state[i][j])
+            {
+                state2_counter++;
+            }
+        }
+    }
+
+    // g(n)
+    state1_counter += state1.depth;
+    state2_counter += state2.depth;
+
+    if (state1_counter >= state2_counter)
+    {
+        return false;
+    }
+    return true;
+}
+
+// bool** heuristic2(vector<bool**> current_state_childs, int row, int col)
+// {
+
+// }
+
+int tRow, tCol;
+bool heuristic1_comprator(bool** state1, bool** state2)
+{
+    int state1_counter = 0;
+    int state2_counter = 0;
+    for (int i = 0; i < tRow; i++)
+    {
+        for (int j = 0; j < tCol; j++)
+        {
+            if (!state1[i][j])
+            {
+                state1_counter++;
+            }
+            if (!state2[i][j])
+            {
+                state2_counter++;
+            }
+        }
+    }
+
+    if (state1_counter >= state2_counter)
+    {
+        return false;
+    }
+    return true;
+}
 
 void greedy(int** table, int row, int col)
+{
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    vector<bool**> current_state_childs;
+    current_state_childs = successor(table, current_state, row, col);
+
+    tRow = row;
+    tCol = col;
+    priority_queue<bool**, vector<bool**>, function<bool(bool**, bool**)> > pq(heuristic1_comprator);
+
+    for (int i = 0; i < current_state_childs.size(); i++ )
+    {
+        pq.push(current_state_childs[i]);
+    }
+
+    while (!pq.empty())
+    {
+        current_state = pq.top();
+        pq.pop();
+
+        if (is_goal(table, current_state, row, col))
+        {
+            cout << "we have reached the goal" << endl;
+            printState(current_state, row, col);
+            break;
+        }
+        else
+        {
+            vector<bool**> new_state_childs;
+            new_state_childs = successor(table, current_state, row, col);
+            for (int i = 0; i < new_state_childs.size(); i++ )
+            {
+                pq.push(new_state_childs[i]);
+            }
+            new_state_childs.clear();
+        }
+    }
+}
+
+void a_star(int** table, int row, int col)
+{
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    vector<bool**> current_state_childs;
+    current_state_childs = successor(table, current_state, row, col);
+
+    priority_queue<state_with_depth, vector<state_with_depth>, function<bool(state_with_depth, state_with_depth)> > pq(heuristic1_comprator_a_star);
+
+    for (int i = 0; i < current_state_childs.size(); i++ )
+    {
+        pq.push(state_with_depth(current_state_childs[i],row, col, 0));
+    }
+
+    int current_state_depth = 0;
+
+    while (!pq.empty())
+    {
+        current_state = pq.top().state;
+        current_state_depth = pq.top().depth;
+        pq.pop();
+
+        if (is_goal(table, current_state, row, col))
+        {
+            cout << "we have reached the goal" << endl;
+            printState(current_state, row, col);
+            break;
+        }
+
+        else
+        {
+            vector<bool**> new_state_childs;
+            new_state_childs = successor(table, current_state, row, col);
+            for (int i = 0; i < new_state_childs.size(); i++ )
+            {
+                pq.push(state_with_depth(new_state_childs[i], row, col, current_state_depth+1));
+            }
+            new_state_childs.clear();
+        }
+    }
+}
+
+void hill_climbing(int** table, int row, int col)
 {
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
@@ -301,94 +446,12 @@ void greedy(int** table, int row, int col)
             // printState(vv, row, col);
             // cin.get();
         // }
-        printState(current_state, row, col);
+        // printState(current_state, row, col);
         // cin.get();
     }
     cout << "we have reached the goal" << endl;
     printState(current_state, row, col);
 }
-
-
-
-// bool** heuristic2(vector<bool**> current_state_childs, int row, int col)
-// {
-
-// }
-
-void greedy1(int** table, int row, int col)
-{
-    bool** current_state = new bool*[row];
-    for (int i = 0; i < row; i++)
-    {
-        current_state[i] = new bool[col];
-        for (int j = 0; j < col; j++)
-        {
-            current_state[i][j] = true;
-        }
-    }
-
-    cout <<"test1" << endl;
-
-    // int** current_state = table;
-    vector<bool**> current_state_childs;
-    current_state_childs = successor(table, current_state, row, col);
-
-    priority_queue<bool**> pq;
-
-    for (int i = 0; i < current_state_childs.size(); i++ )
-    {
-        pq.push(current_state_childs[i]);
-        // printState(pq.top(), row, col);
-        // cout<< endl;
-    }
-
-    // cout <<"test2" << endl;
-    
-
-    
-    while (!pq.empty())
-    {
-        current_state = pq.top();
-        printState(current_state, row, col);
-        pq.pop();
-        // cout <<"test3" << endl;
-
-        if (is_goal(table, current_state, row, col))
-        {
-            cout << "we have reached the goal" << endl;
-            printState(current_state, row, col);
-            break;
-        }
-
-        else
-        {
-            cout <<"test4" << endl;
-            vector<bool**> new_state_childs;
-            cout << "test5" << endl;
-            new_state_childs = successor(table, current_state, row, col);
-            for (int i = 0; i < new_state_childs.size(); i++ )
-            {
-                pq.push(new_state_childs[i]);
-            }
-            cout <<"test6" << endl;
-            new_state_childs.clear();
-            
-            
-        }
-     
-        // printState(current_state, row, col);
-        // cin.get();
-    }
-    
-}
-
-void a_star1(int** table, int row, int col)
-{
-    // while (!)
-}
-
-
-
 
 int main(int argc, char** argv)
 {
@@ -493,14 +556,16 @@ int main(int argc, char** argv)
     // is_goal(test_table, test_state, test_row, test_col);
     // successor(test_table, test_state, test_row, test_col);
     //which algorithm
-    cout << "fckNazi" << endl;
     // printState(current_state, row, col);
 
     // successor(table, current_state, row, col);
     if (newArgv == "greedy")
     {
         // successor(table, current_state, row, col);
-        greedy1(table, row, col);
-        cout << "wtf" << endl;
+        greedy(table, row, col);
+    }
+    else if (newArgv == "a_star")
+    {
+        a_star(table, row, col);
     }
 }
