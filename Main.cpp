@@ -209,33 +209,6 @@ bool** heuristic1(vector<bool**> current_state_childs, int row, int col)
     return current_state_childs.at(max_tmp_index);
 }
 
-int tRow, tCol;
-bool heuristic1_comprator(bool** state1, bool** state2)
-{
-    int state1_counter = 0;
-    int state2_counter = 0;
-    for (int i = 0; i < tRow; i++)
-    {
-        for (int j = 0; j < tCol; j++)
-        {
-            if (!state1[i][j])
-            {
-                state1_counter++;
-            }
-            if (!state2[i][j])
-            {
-                state2_counter++;
-            }
-        }
-    }
-
-    if (state1_counter >= state2_counter)
-    {
-        return false;
-    }
-    return true;
-}
-
 class state_with_depth
 {
 public:
