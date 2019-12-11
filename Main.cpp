@@ -4,6 +4,8 @@
 #include <queue>
 #include <algorithm>
 #include <functional>
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -386,6 +388,22 @@ void a_star(int** table, int row, int col)
     }
 }
 
+int heuristic1_calc(bool** state, int row, int col)
+{
+    int counter = 0;
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (!state[i][j])
+            {
+                counter++;
+            }
+        }
+    }
+    return counter;
+}
+
 void hill_climbing(int** table, int row, int col)
 {
     bool** current_state = new bool*[row];
@@ -398,41 +416,35 @@ void hill_climbing(int** table, int row, int col)
         }
     }
 
-    // int** current_state = table;
     vector<bool**> current_state_childs;
 
     while (!is_goal(table, current_state, row, col))
     {
-
         current_state_childs = successor(table, current_state, row, col);
 
         if (current_state_childs.size() > 0)
-        {
+        {           
             current_state = heuristic1(current_state_childs, row, col);
         }
-        // current_state = current_state_childs[0];
+        else
+        {
+            cout << "goal not found" << endl;
+            printState(current_state, row, col);
+            return;
+        }
+        
         current_state_childs.clear();
-        cout << endl;
-        // cout << "current state" << endl;
-        // for (auto vv : current_state_childs)
-        // {
-            // printState(vv, row, col);
-            // cin.get();
-        // }
         // printState(current_state, row, col);
+        // cout << endl;
         // cin.get();
     }
     cout << "we have reached the goal" << endl;
     printState(current_state, row, col);
 }
 
-
-bool** heuristic1_random(vector<bool**> current_state_childs, int row, int col) 
+vector<int> heuristic1_random(vector<bool**> current_state_childs, int row, int col) 
 {
-    // cout << "heuristic size: " << current_state_childs.size() << endl;
-
-    
-    vector<pair<int, int>> black_num;
+    vector<int> black_num;
     for(int x = 0; x < current_state_childs.size(); x++)
     {
         int counter = 0;
@@ -447,30 +459,14 @@ bool** heuristic1_random(vector<bool**> current_state_childs, int row, int col)
             }
         }
         // cout << "this is counter "<< counter << endl;
-        black_num.push_back(make_pair(counter, x));
+        black_num.push_back(counter);
     }
 
-    int max_tmp = black_num.at(0).first;
-    int max_tmp_index = black_num.at(0).second;
-    for (int i = 0; i < black_num.size(); i++)
-    {
-        if (black_num.at(i).first > max_tmp)
-        {
-            max_tmp = black_num.at(i).first;
-            max_tmp_index = black_num.at(i).second;
-        }
-    }
-    // int max_black = *max_element(black_num.begin(), black_num.end());
-    // cout << max_black << endl;
-    
-    // cin.get();
-    return current_state_childs.at(max_tmp_index);
+    return black_num;
 }
-
 
 void random_hill_climbing(int** table, int row, int col)
 {
-
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
     {
@@ -481,36 +477,56 @@ void random_hill_climbing(int** table, int row, int col)
         }
     }
 
-    // int** current_state = table;
     vector<bool**> current_state_childs;
+
     while (!is_goal(table, current_state, row, col))
     {
-
         current_state_childs = successor(table, current_state, row, col);
 
         if (current_state_childs.size() > 0)
         {
-            current_state = heuristic1_random(current_state_childs, row, col);
+            // bool** current_state_childs_heuristic = heuristic1(current_state_childs, row, col);
+            vector<int> current_state_childs_heuristic = heuristic1_random(current_state_childs, row, col);
+            int childs_heuristic_sum = 0;
+            for (int i = 0; i < current_state_childs_heuristic.size(); i++)
+            {
+                childs_heuristic_sum += current_state_childs_heuristic.at(i);
+            }
+            float random_number = rand() / (float) RAND_MAX;
+            float tmp_rand = 0;
+            int index = 0;
+            cout << random_number << endl;
+
+            while(tmp_rand < random_number)
+            {
+                tmp_rand += (float) current_state_childs_heuristic.at(index) / (float) childs_heuristic_sum;
+                index++;
+            }
+            index -= 1;
+
+            current_state = current_state_childs.at(index);
         }
-        // current_state = current_state_childs[0];
+        else
+        {
+            cout << "goal not found" << endl;
+            printState(current_state, row, col);
+            return;
+        }
+        
         current_state_childs.clear();
-        cout << endl;
-        // cout << "current state" << endl;
-        // for (auto vv : current_state_childs)
-        // {
-            // printState(vv, row, col);
-            // cin.get();
-        // }
         // printState(current_state, row, col);
+        // cout << endl;
         // cin.get();
     }
     cout << "we have reached the goal" << endl;
-    printState(current_state, row, col);
+    printState(current_state, row, col);    
 }
 
 
 int main(int argc, char** argv)
 {
+    srand(time(NULL));
+
     vector<vector<int>> table_vec;
 
     ifstream input_file("samples/sample" + (string) argv[2] + ".txt");
@@ -623,5 +639,13 @@ int main(int argc, char** argv)
     else if (newArgv == "a_star")
     {
         a_star(table, row, col);
+    }
+    else if (newArgv == "hc")
+    {
+        hill_climbing(table, row, col);
+    }
+    else if (newArgv == "hcr")
+    {
+        random_hill_climbing(table, row, col);
     }
 }
