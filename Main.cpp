@@ -426,6 +426,89 @@ void hill_climbing(int** table, int row, int col)
     printState(current_state, row, col);
 }
 
+
+bool** heuristic1_random(vector<bool**> current_state_childs, int row, int col) 
+{
+    // cout << "heuristic size: " << current_state_childs.size() << endl;
+
+    
+    vector<pair<int, int>> black_num;
+    for(int x = 0; x < current_state_childs.size(); x++)
+    {
+        int counter = 0;
+        for(int i = 0; i < row; i++)
+        {
+            for(int j = 0; j < col; j++)
+            {
+                if(current_state_childs[x][i][j] == false)
+                {
+                    counter++;
+                }
+            }
+        }
+        // cout << "this is counter "<< counter << endl;
+        black_num.push_back(make_pair(counter, x));
+    }
+
+    int max_tmp = black_num.at(0).first;
+    int max_tmp_index = black_num.at(0).second;
+    for (int i = 0; i < black_num.size(); i++)
+    {
+        if (black_num.at(i).first > max_tmp)
+        {
+            max_tmp = black_num.at(i).first;
+            max_tmp_index = black_num.at(i).second;
+        }
+    }
+    // int max_black = *max_element(black_num.begin(), black_num.end());
+    // cout << max_black << endl;
+    
+    // cin.get();
+    return current_state_childs.at(max_tmp_index);
+}
+
+
+void random_hill_climbing(int** table, int row, int col)
+{
+
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    // int** current_state = table;
+    vector<bool**> current_state_childs;
+    while (!is_goal(table, current_state, row, col))
+    {
+
+        current_state_childs = successor(table, current_state, row, col);
+
+        if (current_state_childs.size() > 0)
+        {
+            current_state = heuristic1_random(current_state_childs, row, col);
+        }
+        // current_state = current_state_childs[0];
+        current_state_childs.clear();
+        cout << endl;
+        // cout << "current state" << endl;
+        // for (auto vv : current_state_childs)
+        // {
+            // printState(vv, row, col);
+            // cin.get();
+        // }
+        // printState(current_state, row, col);
+        // cin.get();
+    }
+    cout << "we have reached the goal" << endl;
+    printState(current_state, row, col);
+}
+
+
 int main(int argc, char** argv)
 {
     vector<vector<int>> table_vec;
