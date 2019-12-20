@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <queue>
+#include <stack>
 #include <algorithm>
 #include <functional>
 #include <ctime>
@@ -236,11 +237,11 @@ bool heuristic1_comprator_a_star(state_with_depth state1, state_with_depth state
     {
         for (int j = 0; j < state1.col; j++)
         {
-            if (!state1.state[i][j])
+            if (state1.state[i][j])
             {
                 state1_counter++;
             }
-            if (!state2.state[i][j])
+            if (state2.state[i][j])
             {
                 state2_counter++;
             }
@@ -253,9 +254,9 @@ bool heuristic1_comprator_a_star(state_with_depth state1, state_with_depth state
 
     if (state1_counter >= state2_counter)
     {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 // bool** heuristic2(vector<bool**> current_state_childs, int row, int col)
@@ -283,11 +284,11 @@ bool heuristic1_comprator(bool** state1, bool** state2)
         }
     }
 
-    if (state1_counter >= state2_counter)
+    if (state1_counter < state2_counter)
     {
-        return false;
+        return true;
     }
-    return true;
+    return false;
 }
 
 void greedy(int** table, int row, int col)
@@ -316,7 +317,10 @@ void greedy(int** table, int row, int col)
 
     while (!pq.empty())
     {
+        // cout << endl;
         current_state = pq.top();
+        // printState(current_state, row, col);
+        // cin.get();
         pq.pop();
 
         if (is_goal(table, current_state, row, col))
@@ -337,6 +341,108 @@ void greedy(int** table, int row, int col)
         }
     }
 }
+
+void bfs(int** table, int row, int col)
+{
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    vector<bool**> current_state_childs;
+    current_state_childs = successor(table, current_state, row, col);
+    for (int i = 0; i < current_state_childs.size(); i++)
+    {
+         cout << endl;
+         printState(current_state_childs[i], row, col);
+         cin.get();
+    }
+
+    // priority_queue<state_with_depth, vector<state_with_depth>, function<bool(state_with_depth, state_with_depth)> > pq(heuristic1_comprator_a_star);
+    stack<bool**> pq;
+    for (int i = 0; i < current_state_childs.size(); i++ )
+    {
+        pq.push(current_state_childs.at(i));
+    }
+    vector<bool**> visited;
+    // int current_state_depth = 0;
+
+    int debug_count = 0;
+    while (!pq.empty())
+    {
+        current_state = pq.top();
+        // current_state_depth = pq.top().depth;
+        pq.pop();
+        debug_count++;
+
+        if (debug_count % 10000 == 0)
+        {
+            cout << endl;
+            printState(current_state, row, col);
+            cout << debug_count;
+            // cout << current_state_depth;
+            // cin.get();
+        }
+
+        bool visi = false;
+        for (auto v : visited)
+        {
+            bool not_the_same = false;
+            for (int i = 0; i < row; i++)
+            {
+                for ( int j = 0; j < col; j++)
+                {
+                    if (v[i][j] != current_state[i][j])
+                    {
+                        not_the_same = true;
+                        break;
+                    }
+                }
+                if (not_the_same)
+                    break;
+            }
+            if (not_the_same == false)
+            {
+                visi = true;
+                break;
+            }
+        }
+        if (visi)
+        {
+            continue;
+        }
+        else
+        {
+            visited.push_back(current_state);
+        }
+        
+        
+
+        if (is_goal(table, current_state, row, col))
+        {
+            cout << "we have reached the goal" << endl;
+            printState(current_state, row, col);
+            break;
+        }
+
+        else
+        {
+            vector<bool**> new_state_childs;
+            new_state_childs = successor(table, current_state, row, col);
+            for (int i = 0; i < new_state_childs.size(); i++ )
+            {
+                pq.push(new_state_childs[i]);
+            }
+            new_state_childs.clear();
+        }
+    }
+}
+
 
 void a_star(int** table, int row, int col)
 {
@@ -362,11 +468,20 @@ void a_star(int** table, int row, int col)
 
     int current_state_depth = 0;
 
+    int debug_count = 0;
     while (!pq.empty())
     {
         current_state = pq.top().state;
         current_state_depth = pq.top().depth;
         pq.pop();
+        debug_count++;
+        // if (debug_count % 100 == 0)
+        // {
+            // cout << endl;
+            // printState(current_state, row, col);
+            // cout << current_state_depth;
+            // cin.get();
+        // }
 
         if (is_goal(table, current_state, row, col))
         {
@@ -647,5 +762,9 @@ int main(int argc, char** argv)
     else if (newArgv == "hcr")
     {
         random_hill_climbing(table, row, col);
+    }
+    else if (newArgv == "bfs")
+    {
+        bfs(table, row, col);
     }
 }
