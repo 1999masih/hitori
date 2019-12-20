@@ -342,6 +342,21 @@ void greedy(int** table, int row, int col)
     }
 }
 
+bool CompareStates(bool** state1, bool** state2, int row, int col)
+{
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (state1[i][j] != state2[i][j])
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void bfs(int** table, int row, int col)
 {
     bool** current_state = new bool*[row];
@@ -356,12 +371,12 @@ void bfs(int** table, int row, int col)
 
     vector<bool**> current_state_childs;
     current_state_childs = successor(table, current_state, row, col);
-    for (int i = 0; i < current_state_childs.size(); i++)
-    {
-         cout << endl;
-         printState(current_state_childs[i], row, col);
-         cin.get();
-    }
+    // for (int i = 0; i < current_state_childs.size(); i++)
+    // {
+    //      cout << endl;
+    //      printState(current_state_childs[i], row, col);
+    //      cin.get();
+    // }
 
     // priority_queue<state_with_depth, vector<state_with_depth>, function<bool(state_with_depth, state_with_depth)> > pq(heuristic1_comprator_a_star);
     stack<bool**> pq;
@@ -378,35 +393,12 @@ void bfs(int** table, int row, int col)
         current_state = pq.top();
         // current_state_depth = pq.top().depth;
         pq.pop();
-        debug_count++;
 
-        if (debug_count % 10000 == 0)
-        {
-            cout << endl;
-            printState(current_state, row, col);
-            cout << debug_count;
-            // cout << current_state_depth;
-            // cin.get();
-        }
-
+        
         bool visi = false;
         for (auto v : visited)
         {
-            bool not_the_same = false;
-            for (int i = 0; i < row; i++)
-            {
-                for ( int j = 0; j < col; j++)
-                {
-                    if (v[i][j] != current_state[i][j])
-                    {
-                        not_the_same = true;
-                        break;
-                    }
-                }
-                if (not_the_same)
-                    break;
-            }
-            if (not_the_same == false)
+            if (CompareStates(v, current_state, row, col))
             {
                 visi = true;
                 break;
@@ -416,11 +408,21 @@ void bfs(int** table, int row, int col)
         {
             continue;
         }
-        else
+        
+        visited.push_back(current_state);
+        
+        debug_count++;
+
+        if (debug_count % 1000 == 0)
         {
-            visited.push_back(current_state);
+            cout << endl;
+            printState(current_state, row, col);
+            cout << debug_count;
+            // cout << current_state_depth;
+            // cin.get();
         }
         
+        // cout << "Hello" << endl;
         
 
         if (is_goal(table, current_state, row, col))
