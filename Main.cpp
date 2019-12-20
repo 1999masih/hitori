@@ -87,7 +87,6 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
     {
         for (int j = 0; j < col; j++)
         {
-            
             if (state[i][j])
             {
                 bool** tmpState = CopyState(state, row, col);
@@ -98,7 +97,6 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                 {
                     if (k != j && state[i][k])
                     {
-
                         if (table[i][j] == table[i][k])
                         {
                             if ( (i-1 >= 0 && !tmpState[i-1][k]) || 
@@ -109,7 +107,25 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                     ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) ) ||
                                     ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 < col && !tmpState[i][k+2]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
                                     ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) ) ||
-                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) )
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) ) ||
+                                    
+                                    ( (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k+1 == col) ) ||
+                                    ( (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k+1 == col) ) ||
+                                    ( (k+2 < col && !tmpState[i][k+2]) && (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i == 0) ) ||
+                                    ( (k+2 < col && !tmpState[i][k+2]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (i+1 == row) ) ||
+                                    ( (i-2 >= 0 && !tmpState[i-2][k]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (k == 0) ) ||
+                                    ( (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k == 0) ) ||
+                                    ( (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (i == 0) ) ||
+                                    ( (k-2 >= 0 && !tmpState[i][k-2]) && (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i+1 == row) ) ||
+                                    
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k+1 == col) && (i-1 == 0) ) ||
+                                    ( (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k+1 == col) && (i+2 == row) ) || //wtf
+                                    ( (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (k == 0) && (i-1 == 0) ) ||
+                                    ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k == 0) && (i+2 == row) ) ||
+                                    ( (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (k+2 == col) && (i+1 == row) ) ||
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k-1 == 0) && (i+1 == row) ) ||
+                                    ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 == col) && (i == 0) ) ||
+                                    ( (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k-1 == 0) && (i == 0) )
                                 )
                                 )
                             {
@@ -119,7 +135,6 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                             repeated = true;
                             tmpState[i][k] = false;
                         }
-
                     }
                 }
 
@@ -141,7 +156,25 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                         ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (k+2 < row && !tmpState[k+2][j]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) ) ||
                                         ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j+2 < col && !tmpState[k][j+2]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
                                         ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) ) ||
-                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) )
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) ) ||
+                                    
+                                        ( (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j+1 == col) ) ||
+                                        ( (k+2 < row && !tmpState[k+2][j]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (j+1 == col) ) ||
+                                        ( (j+2 < col && !tmpState[k][j+2]) && (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (k == 0) ) ||
+                                        ( (j+2 < col && !tmpState[k][j+2]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (k+1 == row) ) ||
+                                        ( (k-2 >= 0 && !tmpState[k-2][j]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (j == 0) ) ||
+                                        ( (k+2 < row && !tmpState[k+2][j]) && (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j == 0) ) ||
+                                        ( (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (k == 0) ) ||
+                                        ( (j-2 >= 0 && !tmpState[k][j-2]) && (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k+1 == row) ) ||
+                                        
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j+1 == col) && (k-1 == 0) ) ||
+                                        ( (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (j+1 == col) && (k+2 == row) ) ||
+                                        ( (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (j == 0) && (k-1 == 0) ) ||
+                                        ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j == 0) && (k+2 == row) ) ||
+                                        ( (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (j+2 == col) && (k+1 == row) ) ||
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j-1 == 0) && (k+1 == row) ) ||
+                                        ( (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j+2 == col) && (k == 0) ) ||
+                                        ( (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (j-1 == 0) && (k == 0) )
                                     )
                                     ) 
                                 
@@ -411,16 +444,16 @@ void bfs(int** table, int row, int col)
         
         visited.push_back(current_state);
         
-        debug_count++;
+        // debug_count++;
 
-        if (debug_count % 1000 == 0)
-        {
-            cout << endl;
-            printState(current_state, row, col);
-            cout << debug_count;
-            // cout << current_state_depth;
-            // cin.get();
-        }
+        // if (debug_count % 1000 == 0)
+        // {
+        //     cout << endl;
+        //     printState(current_state, row, col);
+        //     cout << debug_count;
+        //     // cout << current_state_depth;
+        //     // cin.get();
+        // }
         
         // cout << "Hello" << endl;
         
@@ -440,7 +473,7 @@ void bfs(int** table, int row, int col)
             {
                 pq.push(new_state_childs[i]);
             }
-            new_state_childs.clear();
+            // new_state_childs.clear();
         }
     }
 }
