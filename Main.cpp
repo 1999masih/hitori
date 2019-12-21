@@ -79,6 +79,100 @@ void printState(bool** state, int row, int col)
 
 }
 
+vector<bool**> successor2(int** table, bool** state, int row, int col)
+{
+    vector<bool**> result;
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (state[i][j])
+            {
+                bool** tmpState = CopyState(state, row, col);
+                bool flagRepeated = false;
+
+                for (int k = 0; k < col; k++)
+                {
+                    if (k != j && state[i][k])
+                    {
+                        if (table[i][j] == table[i][k])
+                        {
+                            flagRepeated = true;
+                            break;
+                        }
+                    }
+                }
+                if (!flagRepeated)
+                {
+                    for (int k = 0; k < row; k++)
+                    {
+                        if (k != i && state[k][j])
+                        {
+                            if (table[i][j] == table[k][j])
+                            {
+                                flagRepeated = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (flagRepeated)
+                {
+                    if ( (i-1 >= 0 && !tmpState[i-1][j]) || 
+                        (i+1 < row && !tmpState[i+1][j]) ||
+                        (j-1 >= 0 && !tmpState[i][j-1]) ||
+                        (j+1 < col && !tmpState[i][j+1]) ||
+                        (
+                            ( (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (i+2 < row && !tmpState[i+2][j]) && (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) ) ||
+                            ( (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (j+2 < col && !tmpState[i][j+2]) && (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) ) ||
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (i-2 >= 0 && !tmpState[i-2][j]) && (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) ) ||
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (j-2 >= 0 && !tmpState[i][j-2]) && (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) ) ||
+                            
+                            ( (i-2 >= 0 && !tmpState[i-2][j]) && (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (j+1 == col) ) ||
+                            ( (i+2 < row && !tmpState[i+2][j]) && (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (j+1 == col) ) ||
+                            ( (j+2 < col && !tmpState[i][j+2]) && (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (i == 0) ) ||
+                            ( (j+2 < col && !tmpState[i][j+2]) && (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (i+1 == row) ) ||
+                            ( (i-2 >= 0 && !tmpState[i-2][j]) && (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (j == 0) ) ||
+                            ( (i+2 < row && !tmpState[i+2][j]) && (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (j == 0) ) ||
+                            ( (j-2 >= 0 && !tmpState[i][j-2]) && (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (i == 0) ) ||
+                            ( (j-2 >= 0 && !tmpState[i][j-2]) && (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (i+1 == row) ) ||
+                            
+                            ( (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (i+2 == row) ) ||
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (i-1 == 0) ) ||
+                            ( (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (j+2 == col) ) ||
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (j-1 == 0) ) ||
+                            
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (j+1 == col) && (i-1 == 0) ) ||
+                            ( (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (j+1 == col) && (i+2 == row) ) ||
+                            ( (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (j == 0) && (i-1 == 0) ) ||
+                            ( (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (j == 0) && (i+2 == row) ) ||
+                            ( (i-1 >= 0 && j+1 < col && !tmpState[i-1][j+1]) && (j+2 == col) && (i+1 == row) ) ||
+                            ( (i-1 >= 0 && j-1 >= 0 && !tmpState[i-1][j-1]) && (j-1 == 0) && (i+1 == row) ) ||
+                            ( (i+1 < row && j+1 < col && !tmpState[i+1][j+1]) && (j+2 == col) && (i == 0) ) ||
+                            ( (i+1 < row && j-1 >= 0 && !tmpState[i+1][j-1]) && (j-1 == 0) && (i == 0) )
+                        )
+                        )
+                    {
+                        DeleteState(tmpState, row, col);
+                    }
+                    else
+                    {
+                        tmpState[i][j] = false;
+                        result.push_back(tmpState);
+                    }
+                }
+                else
+                {
+                    DeleteState(tmpState, row, col);
+                }
+                
+            }
+        }
+    }
+    return result;
+}
+
 vector<bool**> successor(int** table, bool** state, int row, int col)
 {
     vector<bool**> result;
@@ -117,9 +211,14 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                     ( (i+2 < row && !tmpState[i+2][k]) && (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k == 0) ) ||
                                     ( (k-2 >= 0 && !tmpState[i][k-2]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (i == 0) ) ||
                                     ( (k-2 >= 0 && !tmpState[i][k-2]) && (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i+1 == row) ) ||
+
+                                    ( (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (i+2 == row) ) ||
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (i-1 == 0) ) ||
+                                    ( (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k+2 == col) ) ||
+                                    ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k-1 == 0) ) ||
                                     
                                     ( (i-1 >= 0 && k-1 >= 0 && !tmpState[i-1][k-1]) && (k+1 == col) && (i-1 == 0) ) ||
-                                    ( (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k+1 == col) && (i+2 == row) ) || //wtf
+                                    ( (i+1 < row && k-1 >= 0 && !tmpState[i+1][k-1]) && (k+1 == col) && (i+2 == row) ) ||
                                     ( (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (k == 0) && (i-1 == 0) ) ||
                                     ( (i+1 < row && k+1 < col && !tmpState[i+1][k+1]) && (k == 0) && (i+2 == row) ) ||
                                     ( (i-1 >= 0 && k+1 < col && !tmpState[i-1][k+1]) && (k+2 == col) && (i+1 == row) ) ||
@@ -167,6 +266,11 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                                         ( (j-2 >= 0 && !tmpState[k][j-2]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (k == 0) ) ||
                                         ( (j-2 >= 0 && !tmpState[k][j-2]) && (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k+1 == row) ) ||
                                         
+                                        ( (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (k+2 == row) ) ||
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (k-1 == 0) ) ||
+                                        ( (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (k+1 < row && j+1 < col && !tmpState[k+1][j+1]) && (j+2 == col) ) ||
+                                        ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (j-1 == 0) ) ||
+                                    
                                         ( (k-1 >= 0 && j-1 >= 0 && !tmpState[k-1][j-1]) && (j+1 == col) && (k-1 == 0) ) ||
                                         ( (k+1 < row && j-1 >= 0 && !tmpState[k+1][j-1]) && (j+1 == col) && (k+2 == row) ) ||
                                         ( (k-1 >= 0 && j+1 < col && !tmpState[k-1][j+1]) && (j == 0) && (k-1 == 0) ) ||
@@ -191,7 +295,9 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                 }
 
                 if (!twoWhites && repeated)
-                {
+                {   
+                    cout << endl;
+                    printState(tmpState, row, col);
                     result.push_back(tmpState);
                 }
                 
@@ -324,6 +430,13 @@ bool heuristic1_comprator(bool** state1, bool** state2)
     return false;
 }
 
+
+// bool heuristic2_compartor(bool** state1, bool** state2)
+// {
+//     int repeat1_counter = 0;
+//     int repaet2_counter = 0;
+// }
+
 void greedy(int** table, int row, int col)
 {
     bool** current_state = new bool*[row];
@@ -350,9 +463,9 @@ void greedy(int** table, int row, int col)
 
     while (!pq.empty())
     {
-        // cout << endl;
+        cout << endl;
         current_state = pq.top();
-        // printState(current_state, row, col);
+        printState(current_state, row, col);
         // cin.get();
         pq.pop();
 
@@ -444,16 +557,16 @@ void bfs(int** table, int row, int col)
         
         visited.push_back(current_state);
         
-        // debug_count++;
+        debug_count++;
 
-        // if (debug_count % 1000 == 0)
-        // {
+        // // if (debug_count % 1000 == 0)
+        // // {
         //     cout << endl;
         //     printState(current_state, row, col);
         //     cout << debug_count;
         //     // cout << current_state_depth;
-        //     // cin.get();
-        // }
+        //     cin.get();
+        // // }
         
         // cout << "Hello" << endl;
         
@@ -780,26 +893,26 @@ int main(int argc, char** argv)
     //which algorithm
     // printState(current_state, row, col);
 
-    // successor(table, current_state, row, col);
-    if (newArgv == "greedy")
-    {
-        // successor(table, current_state, row, col);
-        greedy(table, row, col);
-    }
-    else if (newArgv == "a_star")
-    {
-        a_star(table, row, col);
-    }
-    else if (newArgv == "hc")
-    {
-        hill_climbing(table, row, col);
-    }
-    else if (newArgv == "hcr")
-    {
-        random_hill_climbing(table, row, col);
-    }
-    else if (newArgv == "bfs")
-    {
-        bfs(table, row, col);
-    }
+    successor(table, current_state, row, col);
+    // if (newArgv == "greedy")
+    // {
+    //     // successor(table, current_state, row, col);
+    //     greedy(table, row, col);
+    // }
+    // else if (newArgv == "a_star")
+    // {
+    //     a_star(table, row, col);
+    // }
+    // else if (newArgv == "hc")
+    // {
+    //     hill_climbing(table, row, col);
+    // }
+    // else if (newArgv == "hcr")
+    // {
+    //     random_hill_climbing(table, row, col);
+    // }
+    // else if (newArgv == "bfs")
+    // {
+    //     bfs(table, row, col);
+    // }
 }
