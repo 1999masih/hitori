@@ -7,8 +7,12 @@
 #include <functional>
 #include <ctime>
 #include <cstdlib>
+#include <cmath>
+#include <chrono>
 
 using namespace std;
+
+int ** globalTable;
 
 bool is_goal(int** table, bool** state, int row, int col)
 {
@@ -295,9 +299,7 @@ vector<bool**> successor(int** table, bool** state, int row, int col)
                 }
 
                 if (!twoWhites && repeated)
-                {   
-                    cout << endl;
-                    printState(tmpState, row, col);
+                {
                     result.push_back(tmpState);
                 }
                 
@@ -351,6 +353,60 @@ bool** heuristic1(vector<bool**> current_state_childs, int row, int col)
     return current_state_childs.at(max_tmp_index);
 }
 
+
+bool** heuristic2(int ** table, vector<bool**> current_state_childs, int row, int col) 
+{   
+
+    vector<pair<int, int>> repeated;
+    int counter = 0;
+    for(int x = 0; x < current_state_childs.size(); x++)
+    {
+        for(int i = 0; i < row; i++)
+         {
+            for(int j = 0; j < col; j++ )
+            {
+                if(current_state_childs[x][i][j])
+                {
+                    for (int k = 0; k < col; k++)
+                    {   
+                        if (k != j && current_state_childs[x][i][k])
+                        {
+                            if (table[i][j] == table[i][k])
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                    for (int k = 0; k < row; k++)
+                    {
+                        if (k != i && current_state_childs[x][i][k])
+                        {
+                            if (table[i][j] == table[k][j])
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                
+                }
+            }
+        }
+         repeated.push_back(make_pair(counter, x));
+
+    }
+
+    int min_tmp = repeated.at(0).first;
+    int min_tmp_index = repeated.at(0).second;
+    for (int i = 0; i < repeated.size(); i++)
+    {
+        if (repeated.at(i).first < min_tmp)
+        {
+            min_tmp = repeated.at(i).first;
+            min_tmp_index = repeated.at(i).second;
+        }
+    }
+    return current_state_childs.at(min_tmp_index);
+}
 class state_with_depth
 {
 public:
@@ -398,10 +454,7 @@ bool heuristic1_comprator_a_star(state_with_depth state1, state_with_depth state
     return false;
 }
 
-// bool** heuristic2(vector<bool**> current_state_childs, int row, int col)
-// {
 
-// }
 
 int tRow, tCol;
 bool heuristic1_comprator(bool** state1, bool** state2)
@@ -431,14 +484,161 @@ bool heuristic1_comprator(bool** state1, bool** state2)
 }
 
 
-// bool heuristic2_compartor(bool** state1, bool** state2)
-// {
-//     int repeat1_counter = 0;
-//     int repaet2_counter = 0;
-// }
+bool heuristic2_comprator_a_star(state_with_depth state1, state_with_depth state2)
+{
+
+     int state1_counter = 0;
+    int state2_counter = 0;
+    for (int i = 0; i < tRow; i++)
+    {
+        for (int j = 0; j < tCol; j++)
+        {
+            if(state1.state[i][j])
+            {
+                for(int k = 0 ; k < state1.col; k++ )
+                {
+                    if(k != j && state1.state[i][k])
+                    {
+                        if (globalTable[i][j] ==  globalTable[i][k])
+                        {
+                            state1_counter++;
+                        }
+                    }
+                }
+            }
+            if(state1.state[i][j])
+            {
+                for(int k = 0 ; k < state1.row; k++ )
+                {
+                    if(k != i && state1.state[k][i])
+                    {
+                        if ( globalTable[i][j] ==  globalTable[k][j])
+                        {
+                            state1_counter++;
+                        }
+                    }
+                }
+            }
+            if(state2.state[i][j])
+            {
+                for(int k = 0 ; k < tCol; k++ )
+                {
+                    if(k != j && state2.state[i][k])
+                    {
+                        if (globalTable[i][j] ==  globalTable[i][k])
+                        {
+                            state2_counter++;
+                        }
+                    }
+                }
+            }
+            if(state2.state[i][j])
+            {
+                for(int k = 0 ; k < tRow; k++ )
+                {
+                    if(k != i && state2.state[k][i])
+                    {
+                        if ( globalTable[i][j] ==  globalTable[k][j])
+                        {
+                            state2_counter++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    state1_counter += state1.depth;
+    state2_counter += state2.depth;
+
+    if(state1_counter >= state2_counter)
+    {
+        return false;
+    }
+
+    return true;
+    
+
+}
+bool heuristic2_comprator(bool** state1, bool** state2)
+{
+    int state1_counter = 0;
+    int state2_counter = 0;
+    for (int i = 0; i < tRow; i++)
+    {
+        for (int j = 0; j < tCol; j++)
+        {
+            if(state1[i][j])
+            {
+                for(int k = 0 ; k < tCol; k++ )
+                {
+                    if(k != j && state1[i][k])
+                    {
+                        if (globalTable[i][j] ==  globalTable[i][k])
+                        {
+                            state1_counter++;
+                        }
+                    }
+                }
+            }
+            if(state1[i][j])
+            {
+                for(int k = 0 ; k < tRow; k++ )
+                {
+                    if(k != i && state1[k][i])
+                    {
+                        if ( globalTable[i][j] ==  globalTable[k][j])
+                        {
+                            state1_counter++;
+                        }
+                    }
+                }
+            }
+            if(state2[i][j])
+            {
+                for(int k = 0 ; k < tCol; k++ )
+                {
+                    if(k != j && state2[i][k])
+                    {
+                        if (globalTable[i][j] ==  globalTable[i][k])
+                        {
+                            state2_counter++;
+                        }
+                    }
+                }
+            }
+            if(state2[i][j])
+            {
+                for(int k = 0 ; k < tRow; k++ )
+                {
+                    if(k != i && state2[k][i])
+                    {
+                        if ( globalTable[i][j] ==  globalTable[k][j])
+                        {
+                            state2_counter++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(state1_counter >= state2_counter)
+    {
+        return false;
+    }
+
+    return true;
+    
+
+}
+
+
 
 void greedy(int** table, int row, int col)
 {
+    int nodes = 1;
+    int max_states = 0;
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
     {
@@ -451,10 +651,10 @@ void greedy(int** table, int row, int col)
 
     vector<bool**> current_state_childs;
     current_state_childs = successor(table, current_state, row, col);
-
+    
     tRow = row;
     tCol = col;
-    priority_queue<bool**, vector<bool**>, function<bool(bool**, bool**)> > pq(heuristic1_comprator);
+    priority_queue<bool**, vector<bool**>, function<bool(bool**, bool**)> > pq(heuristic2_comprator);
 
     for (int i = 0; i < current_state_childs.size(); i++ )
     {
@@ -463,15 +663,18 @@ void greedy(int** table, int row, int col)
 
     while (!pq.empty())
     {
-        cout << endl;
+        max_states = max(max_states, (int) pq.size());
+        // cout << endl;
         current_state = pq.top();
-        printState(current_state, row, col);
+        // printState(current_state, row, col);
         // cin.get();
         pq.pop();
 
         if (is_goal(table, current_state, row, col))
         {
             cout << "we have reached the goal" << endl;
+            cout << "Nodes Expanded: " << nodes << endl;
+            cout << "Maximum Storage Occupied: " << max_states << endl;
             printState(current_state, row, col);
             break;
         }
@@ -479,6 +682,7 @@ void greedy(int** table, int row, int col)
         {
             vector<bool**> new_state_childs;
             new_state_childs = successor(table, current_state, row, col);
+            nodes += 1;
             for (int i = 0; i < new_state_childs.size(); i++ )
             {
                 pq.push(new_state_childs[i]);
@@ -516,7 +720,7 @@ void bfs(int** table, int row, int col)
     }
 
     vector<bool**> current_state_childs;
-    current_state_childs = successor(table, current_state, row, col);
+    current_state_childs = successor2(table, current_state, row, col);
     // for (int i = 0; i < current_state_childs.size(); i++)
     // {
     //      cout << endl;
@@ -581,7 +785,7 @@ void bfs(int** table, int row, int col)
         else
         {
             vector<bool**> new_state_childs;
-            new_state_childs = successor(table, current_state, row, col);
+            new_state_childs = successor2(table, current_state, row, col);
             for (int i = 0; i < new_state_childs.size(); i++ )
             {
                 pq.push(new_state_childs[i]);
@@ -594,6 +798,8 @@ void bfs(int** table, int row, int col)
 
 void a_star(int** table, int row, int col)
 {
+    int nodes = 1;
+    int max_states = 0;
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
     {
@@ -605,9 +811,9 @@ void a_star(int** table, int row, int col)
     }
 
     vector<bool**> current_state_childs;
-    current_state_childs = successor(table, current_state, row, col);
+    current_state_childs = successor2(table, current_state, row, col);
 
-    priority_queue<state_with_depth, vector<state_with_depth>, function<bool(state_with_depth, state_with_depth)> > pq(heuristic1_comprator_a_star);
+    priority_queue<state_with_depth, vector<state_with_depth>, function<bool(state_with_depth, state_with_depth)> > pq(heuristic2_comprator_a_star);
 
     for (int i = 0; i < current_state_childs.size(); i++ )
     {
@@ -619,10 +825,11 @@ void a_star(int** table, int row, int col)
     int debug_count = 0;
     while (!pq.empty())
     {
+        max_states = max(max_states, (int) pq.size());
         current_state = pq.top().state;
         current_state_depth = pq.top().depth;
         pq.pop();
-        debug_count++;
+        // debug_count++;
         // if (debug_count % 100 == 0)
         // {
             // cout << endl;
@@ -634,6 +841,8 @@ void a_star(int** table, int row, int col)
         if (is_goal(table, current_state, row, col))
         {
             cout << "we have reached the goal" << endl;
+            cout << "Nodes Expanded: " << nodes << endl;
+            cout << "Maximum Storage Occupied: " << max_states << endl;
             printState(current_state, row, col);
             break;
         }
@@ -642,6 +851,7 @@ void a_star(int** table, int row, int col)
         {
             vector<bool**> new_state_childs;
             new_state_childs = successor(table, current_state, row, col);
+            nodes++;
             for (int i = 0; i < new_state_childs.size(); i++ )
             {
                 pq.push(state_with_depth(new_state_childs[i], row, col, current_state_depth+1));
@@ -667,8 +877,108 @@ int heuristic1_calc(bool** state, int row, int col)
     return counter;
 }
 
+int heuristic2_calc(bool** state, int row, int col)
+{
+    int counter = 0;
+    for (int i = 0; i < row; i++)
+    {
+        for (int j = 0; j < col; j++)
+        {
+            if (state[i][j])
+            {
+                for(int k = 0 ;k < col; k++)
+                {
+                    if(k != j && state[i][k])
+                    {
+                        if(globalTable[i][j] == globalTable[i][k])
+                        {
+                            counter++;
+                        }
+                    }
+                }
+                for(int k = 0; k < col; k++)
+                {
+                    if(k != i && state[k][j])
+                    {
+                        if(globalTable[i][j] == globalTable[k][j])
+                        {
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return counter;
+}
+
+
+bool sa(int** table, int row, int col)
+{
+    int nodes = 1;
+    int max_states = 0;
+    bool** current_state = new bool*[row];
+    for (int i = 0; i < row; i++)
+    {
+        current_state[i] = new bool[col];
+        for (int j = 0; j < col; j++)
+        {
+            current_state[i][j] = true;
+        }
+    }
+
+    bool** next_state;
+
+    vector<bool**> current_state_childs;
+
+    for (int t = 1; t < 1000; t++)
+    {
+        nodes++;
+        current_state_childs = successor(table, current_state, row, col);
+
+        float t_sch = pow(t, -0.5);
+        cout << t_sch << endl;
+        if (is_goal(table, current_state, row, col))
+        {
+            cout << "Nodes Expanded: " << nodes << endl;
+            cout << "we have reached the goal" << endl;
+            printState(current_state, row, col);
+            return true;
+        }
+        
+        if (current_state_childs.size() > 0)
+        {
+            float random_number = rand() / (float) RAND_MAX;
+            random_number *= current_state_childs.size();
+            random_number -= 1;
+
+            next_state = current_state_childs.at(random_number);
+
+            float delta_e = heuristic2_calc(next_state, row, col) - heuristic2_calc(current_state, row, col);
+            if (delta_e > 0)
+            {
+                current_state = next_state;
+            }
+            else if (exp(delta_e/t_sch))
+            {
+                current_state = next_state;
+            }
+        }
+        else
+        {
+            cout << "goal not found" << endl;
+            printState(current_state, row, col);
+            return false;
+        }
+
+    }
+    return false;
+    
+}
+
 void hill_climbing(int** table, int row, int col)
 {
+    int nodes = 1;
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
     {
@@ -683,11 +993,12 @@ void hill_climbing(int** table, int row, int col)
 
     while (!is_goal(table, current_state, row, col))
     {
+        nodes++;
         current_state_childs = successor(table, current_state, row, col);
 
         if (current_state_childs.size() > 0)
         {           
-            current_state = heuristic1(current_state_childs, row, col);
+            current_state = heuristic2(table ,current_state_childs, row, col);
         }
         else
         {
@@ -701,6 +1012,7 @@ void hill_climbing(int** table, int row, int col)
         // cout << endl;
         // cin.get();
     }
+    cout << "Nodes Expanded: " << nodes << endl;
     cout << "we have reached the goal" << endl;
     printState(current_state, row, col);
 }
@@ -728,8 +1040,53 @@ vector<int> heuristic1_random(vector<bool**> current_state_childs, int row, int 
     return black_num;
 }
 
+vector<int> heuristic2_random(vector<bool**> current_state_childs, int row, int col)
+{
+    vector<int> repeated;
+    int counter = 0;
+    for(int x = 0; x < current_state_childs.size(); x++)
+    {
+        for(int i = 0; i < row; i++)
+         {
+            for(int j = 0; j < col; j++ )
+            {
+                if(current_state_childs[x][i][j])
+                {
+                    for (int k = 0; k < col; k++)
+                    {   
+                        if (k != j && current_state_childs[x][i][k])
+                        {
+                            if (globalTable[i][j] == globalTable[i][k])
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                    for (int k = 0; k < row; k++)
+                    {
+                        if (k != i && current_state_childs[x][i][k])
+                        {
+                            if (globalTable[i][j] == globalTable[k][j])
+                            {
+                                counter++;
+                            }
+                        }
+                    }
+                
+                }
+            }
+        }
+        repeated.push_back(counter);
+
+    }
+
+    return repeated;
+}
+
+
 void random_hill_climbing(int** table, int row, int col)
 {
+    int nodes = 1;
     bool** current_state = new bool*[row];
     for (int i = 0; i < row; i++)
     {
@@ -744,12 +1101,13 @@ void random_hill_climbing(int** table, int row, int col)
 
     while (!is_goal(table, current_state, row, col))
     {
+        nodes++;
         current_state_childs = successor(table, current_state, row, col);
 
         if (current_state_childs.size() > 0)
         {
             // bool** current_state_childs_heuristic = heuristic1(current_state_childs, row, col);
-            vector<int> current_state_childs_heuristic = heuristic1_random(current_state_childs, row, col);
+            vector<int> current_state_childs_heuristic = heuristic2_random(current_state_childs, row, col);
             int childs_heuristic_sum = 0;
             for (int i = 0; i < current_state_childs_heuristic.size(); i++)
             {
@@ -771,8 +1129,8 @@ void random_hill_climbing(int** table, int row, int col)
         }
         else
         {
-            cout << "goal not found" << endl;
-            printState(current_state, row, col);
+            // cout << "goal not found" << endl;
+            // printState(current_state, row, col);
             return;
         }
         
@@ -781,6 +1139,8 @@ void random_hill_climbing(int** table, int row, int col)
         // cout << endl;
         // cin.get();
     }
+
+    cout << "Nodes Expanded: " << nodes << endl;
     cout << "we have reached the goal" << endl;
     printState(current_state, row, col);    
 }
@@ -821,6 +1181,16 @@ int main(int argc, char** argv)
             table[i][j] = table_vec[i][j];
         }
     }
+    globalTable = new int*[table_vec.size()];
+    for (int i = 0; i < table_vec.size(); i++)
+    {
+         globalTable[i] = new int[table_vec[0].size()];
+        for (int j = 0; j < table_vec[0].size(); j++)
+        {
+             globalTable[i][j] = table_vec[i][j];
+        }
+    }
+
 
     int row = table_vec.size();
     int col = table_vec[0].size();
@@ -893,26 +1263,34 @@ int main(int argc, char** argv)
     //which algorithm
     // printState(current_state, row, col);
 
-    successor(table, current_state, row, col);
-    // if (newArgv == "greedy")
-    // {
-    //     // successor(table, current_state, row, col);
-    //     greedy(table, row, col);
-    // }
-    // else if (newArgv == "a_star")
-    // {
-    //     a_star(table, row, col);
-    // }
-    // else if (newArgv == "hc")
-    // {
-    //     hill_climbing(table, row, col);
-    // }
-    // else if (newArgv == "hcr")
-    // {
-    //     random_hill_climbing(table, row, col);
-    // }
-    // else if (newArgv == "bfs")
-    // {
-    //     bfs(table, row, col);
-    // }
+    auto tStart = chrono::steady_clock::now();
+    // successor(table, current_state, row, col);
+    if (newArgv == "greedy")
+    {
+        // successor(table, current_state, row, col);
+        greedy(table, row, col);
+    }
+    else if (newArgv == "a_star")
+    {
+        a_star(table, row, col);
+    }
+    else if (newArgv == "hc")
+    {
+        hill_climbing(table, row, col);
+    }
+    else if (newArgv == "hcr")
+    {
+        random_hill_climbing(table, row, col);
+    }
+    else if (newArgv == "bfs")
+    {
+        bfs(table, row, col);
+    }
+    else if (newArgv == "sa")
+    {
+        sa(table, row, col);
+    }
+
+    auto tEnd = chrono::steady_clock::now();
+    cout << "Execution Time: " << chrono::duration <double, milli> (tEnd - tStart).count() << " ms" << endl;
 }
